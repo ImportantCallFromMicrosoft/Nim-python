@@ -1,13 +1,13 @@
 import pygame
 
-from agent_definition import Action, GameEnvironment, GameState, DrawBoxesAgentQValues
+from agent_definition import NimAction, GameEnvironment, NimGameState, NimAgent
 
 
 WIDTH = 500
 HEIGHT = 500
 
 
-def draw_game_state(screen, game_state: GameState):
+def draw_game_state(screen, game_state: NimGameState):
     screen.fill((0, 0, 0))
     for col in range(5):
         for row in range(col + 1):
@@ -60,7 +60,7 @@ def show_invalid_move(screen):
 
 
 def main():
-    agent = DrawBoxesAgentQValues.load("agent.json")
+    agent = NimAgent.load("agent.json")
     env = GameEnvironment()
     env.reset()
 
@@ -85,7 +85,7 @@ def main():
                 slot = x // 100
                 amount = 4 - (y // 100)
 
-                action = Action(slot, amount)
+                action = NimAction(slot, amount)
                 print(action)
 
                 _, _, won, invalid, _ = env.step(action)
@@ -102,7 +102,7 @@ def main():
                     break
 
                 # Agent plays second
-                action = Action.from_idx(agent.get_action(hash(env.state)))
+                action = NimAction.from_idx(agent.get_action(hash(env.state)))
                 print(action)
                 _, _, defeated, _, _ = env.step(action)
                 print(env.state)

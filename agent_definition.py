@@ -10,7 +10,7 @@ from collections import defaultdict
 import numpy as np
 
 
-class GameState:
+class NimGameState:
     def __init__(self, slot1: int, slot2: int, slot3: int, slot4: int, slot5: int):
         self._state = [slot1, slot2, slot3, slot4, slot5]
 
@@ -49,10 +49,10 @@ class GameState:
         slot4 = hash % 10
         hash = hash // 10
         slot5 = hash % 10
-        return GameState(slot1, slot2, slot3, slot4, slot5)
+        return NimGameState(slot1, slot2, slot3, slot4, slot5)
 
 
-class Action:
+class NimAction:
     NUM_ACTIONS = 25
 
     def __init__(self, slot: int, amount: int):
@@ -67,20 +67,20 @@ class Action:
 
     @staticmethod
     def from_idx(idx: int):
-        return Action(idx // 5, idx % 5)
+        return NimAction(idx // 5, idx % 5)
 
     def __str__(self):
         return f"Action({self.slot}, {self.amount})"
 
 
 class GameEnvironment:
-    START_STATE = GameState(1, 2, 3, 4, 5)
-    VICTORY_STATE = GameState(0, 0, 0, 0, 0)
+    START_STATE = NimGameState(1, 2, 3, 4, 5)
+    VICTORY_STATE = NimGameState(0, 0, 0, 0, 0)
     PUNISHMENT_ILLEGAL_MOVE = -1
     REWARD_LEGAL_MOVE = 0
     REWARD_VICTORY = 1
 
-    def step(self, action: Action) -> tuple[GameState, int, bool, dict]:
+    def step(self, action: NimAction) -> tuple[NimGameState, int, bool, dict]:
         if (action.amount + 1) <= self.state[action.slot]:
             self.state[action.slot] = self.state[action.slot] - (action.amount + 1)
         else:
@@ -99,7 +99,7 @@ class GameEnvironment:
         return
 
 
-class DrawBoxesAgentQValues:
+class NimAgent:
     def __init__(
         self,
         learning_rate: float,
@@ -118,7 +118,7 @@ class DrawBoxesAgentQValues:
             final_epsilon: The final epsilon value
             discount_factor: The discount factor for computing the Q-value
         """
-        self.q_values = defaultdict(lambda: np.zeros(Action.NUM_ACTIONS))
+        self.q_values = defaultdict(lambda: np.zeros(NimAction.NUM_ACTIONS))
 
         self.lr = learning_rate
         self.discount_factor = discount_factor
@@ -129,14 +129,14 @@ class DrawBoxesAgentQValues:
 
         self.training_error: list[float] = []
 
-    def get_action(self, obs: GameState, opponent: bool = False) -> int:
+    def get_action(self, obs: int, opponent: bool = False) -> int:
         """
         Returns the best action with probability (1 - epsilon)
         otherwise a random action with probability epsilon to ensure exploration.
         """
         # with probability epsilon return a random action to explore the environment
         if np.random.random() < self.epsilon + ((1 - self.epsilon) / 2 * opponent):
-            return np.random.randint(Action.NUM_ACTIONS)
+            return np.random.randint(NimAction.NUM_ACTIONS)
 
         # with probability (1 - epsilon) act greedily (exploit)
         else:
@@ -168,11 +168,11 @@ class DrawBoxesAgentQValues:
     def load(filename):
         with open(filename) as f:
             data = json.load(f)
-            q_values = defaultdict(lambda: np.zeros(Action.NUM_ACTIONS))
+            q_values = defaultdict(lambda: np.zeros(NimAction.NUM_ACTIONS))
             for k, v in data["q_values"].items():
                 q_values[int(k)] = np.array(v)
             del data["q_values"]
-            agent = DrawBoxesAgentQValues(0.0, 0.0, 0.0, 0.0)
+            agent = NimAgent(0.0, 0.0, 0.0, 0.0)
             agent.__dict__.update(data)
             agent.q_values = q_values
         return agent

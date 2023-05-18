@@ -4,7 +4,7 @@ import tqdm
 import matplotlib.pyplot as plt
 import numpy as np
 
-from agent_definition import DrawBoxesAgentQValues, GameEnvironment, Action, GameState
+from agent_definition import NimAgent, GameEnvironment, NimAction, NimGameState
 
 
 VERBOSE = False
@@ -16,12 +16,12 @@ def print_if_verbose(msg: str):
 
 
 def get_valid_state_from_opponent(
-    env: GameEnvironment, agent: DrawBoxesAgentQValues, state: GameState
+    env: GameEnvironment, agent: NimAgent, state: NimGameState
 ):
     print_if_verbose(env.state)
     truncated_other = True
     while truncated_other:
-        action_other = Action.from_idx(agent.get_action(hash(state), opponent=True))
+        action_other = NimAction.from_idx(agent.get_action(hash(state), opponent=True))
         print_if_verbose(action_other)
         next_state, reward, terminated, truncated_other, _ = env.step(action_other)
     if reward == env.REWARD_VICTORY:
@@ -39,7 +39,7 @@ start_epsilon = 0.5
 epsilon_decay = start_epsilon / (n_episodes / 2)  # reduce the exploration over time
 final_epsilon = 0.001
 
-agent = DrawBoxesAgentQValues(
+agent = NimAgent(
     learning_rate=learning_rate,
     initial_epsilon=start_epsilon,
     epsilon_decay=epsilon_decay,
@@ -47,7 +47,7 @@ agent = DrawBoxesAgentQValues(
 )
 
 if LOAD_AGENT and os.path.exists("agent.json"):
-    agent = DrawBoxesAgentQValues.load("agent.json")
+    agent = NimAgent.load("agent.json")
 
 env = GameEnvironment()
 
@@ -71,7 +71,7 @@ for episode in tqdm.tqdm(range(n_episodes)):
     while not done:
         # Agent takes action
         print_if_verbose(env.state)
-        action = Action.from_idx(agent.get_action(hash(obs)))
+        action = NimAction.from_idx(agent.get_action(hash(obs)))
         print_if_verbose(action)
         next_obs, reward, done, truncated, _ = env.step(action)
         agent.update(hash(obs), action.get_idx(), reward, done, hash(next_obs))
