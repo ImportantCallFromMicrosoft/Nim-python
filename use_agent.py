@@ -6,14 +6,14 @@ from agent_definition import NimAction, NimGameEnvironment, NimGameState, NimAge
 WIDTH = 500
 HEIGHT = 500
 
-def get_valid_action_from_agent(
-    env: NimGameEnvironment, agent: NimAgent
-):
+
+def get_valid_action_from_agent(env: NimGameEnvironment, agent: NimAgent):
     invalid = True
     while invalid:
         action = NimAction.from_idx(agent.get_action(hash(env.state)))
         invalid = not env.action_valid(action)
     return action
+
 
 def draw_game_state(screen, game_state: NimGameState):
     screen.fill((0, 0, 0))
@@ -91,9 +91,9 @@ def main():
                 # User plays first
                 x, y = pygame.mouse.get_pos()
                 slot = x // 100
-                pos_y = 5 - (y // 100) 
+                pos_y = 5 - (y // 100)
                 amount = env.state[slot] - pos_y
-                
+
                 player_action = NimAction(slot, amount)
 
                 if not env.action_valid(player_action):
@@ -112,7 +112,7 @@ def main():
                     break
 
                 # Agent plays second
-                
+
                 agent_action = get_valid_action_from_agent(env, agent)
                 print(agent_action)
                 _, _, won, _, _ = env.step(agent_action)

@@ -97,7 +97,7 @@ class NimGameEnvironment:
 
     def render(self, mode="human"):
         return
-    
+
     def action_valid(self, action: NimAction) -> bool:
         return (
             action.slot >= 0
@@ -105,7 +105,6 @@ class NimGameEnvironment:
             and action.amount >= 0
             and (action.amount + 1) <= self.state[action.slot]
         )
-
 
 
 class NimAgent:

@@ -15,20 +15,20 @@ def print_if_verbose(msg: str):
         print(msg)
 
 
-def get_valid_action_from_opponent(
-    env: NimGameEnvironment, agent: NimAgent
-):
+def get_valid_action_from_opponent(env: NimGameEnvironment, agent: NimAgent):
     invalid = True
     while invalid:
         action = NimAction.from_idx(agent.get_action(hash(env.state), opponent=True))
         invalid = not env.action_valid(action)
     return action
 
+
 def let_opponent_move(env: NimGameEnvironment, agent: NimAgent) -> NimGameState:
     action = get_valid_action_from_opponent(env, agent)
     obs, _, done, truncated, _ = env.step(action)
     assert not truncated
     return obs, done
+
 
 # hyperparameters
 LOAD_AGENT = True
@@ -37,6 +37,7 @@ NUM_EPISODES = 100000
 INITIAL_EPSILON = 0.5
 EPSILON_DECAY = INITIAL_EPSILON / (NUM_EPISODES / 2)  # reduce the exploration over time
 FINAL_EPSILON = 0.001
+
 
 def main():
     agent = NimAgent(
@@ -60,7 +61,7 @@ def main():
         done = False
 
         steps = 0
-        
+
         # with probability 0.5, let the opponent start
         if np.random.rand() < 0.5:
             obs, _ = let_opponent_move(env, agent)
@@ -133,6 +134,7 @@ def main():
     axs[3].plot(range(len(training_win_ratio)), training_win_ratio)
     plt.tight_layout()
     plt.show()
+
 
 if __name__ == "__main__":
     main()
