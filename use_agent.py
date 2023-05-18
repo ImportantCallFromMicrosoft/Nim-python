@@ -1,5 +1,6 @@
 import pygame
 import random
+import time
 
 from agent_definition import NimAction, NimGameEnvironment, NimGameState, NimAgent
 
@@ -16,10 +17,10 @@ def get_valid_action_from_agent(env: NimGameEnvironment, agent: NimAgent):
     return action
 
 
-def show_who_starts(screen, agent_starts: bool):
+def show_whose_turn(screen, agents_turn: bool):
     font = pygame.font.SysFont("Arial", 50)
     color = (150, 0, 150)
-    text =  font.render("Opponent starts!" if agent_starts else "You start!", True, color) 
+    text =  font.render("Opponent's turn." if agents_turn else "Your turn.", True, color) 
     # draw the text in the center of the screen
     text_rect = text.get_rect(center=(WIDTH // 2, HEIGHT // 2))
     screen.blit(text, text_rect)
@@ -89,8 +90,9 @@ def main():
     print(env.state)
 
     # With 50% probability, the agent plays first
+    random.seed(time.time())
     opponent_starts = random.random() < 0.5
-    show_who_starts(screen, opponent_starts)
+    show_whose_turn(screen, opponent_starts)
     
     if opponent_starts:
         pygame.time.wait(1000)
@@ -132,9 +134,11 @@ def main():
                     running = False
                     break
 
+                show_whose_turn(screen, True)
+                pygame.time.wait(500)
+
                 # Agent plays second
 
-                pygame.time.wait(300)
                 agent_action = get_valid_action_from_agent(env, agent)
                 print(agent_action)
                 _, _, won, _, _ = env.step(agent_action)
@@ -145,6 +149,9 @@ def main():
                     show_victory_screen(screen)
                     running = False
                     break
+
+                show_whose_turn(screen, False)
+                pygame.time.wait(500)
 
     # Wait for user to close window
     while True:
