@@ -6,6 +6,14 @@ from agent_definition import NimAction, GameEnvironment, NimGameState, NimAgent
 WIDTH = 500
 HEIGHT = 500
 
+def get_valid_action_from_agent(
+    env: GameEnvironment, agent: NimAgent
+):
+    invalid = True
+    while invalid:
+        action = NimAction.from_idx(agent.get_action(hash(env.state)))
+        invalid = not env.action_valid(action)
+    return action
 
 def draw_game_state(screen, game_state: NimGameState):
     screen.fill((0, 0, 0))
@@ -80,20 +88,34 @@ def main():
                 running = False
 
             if event.type == pygame.MOUSEBUTTONDOWN:
-                # Use plays first
+                # User plays first
                 x, y = pygame.mouse.get_pos()
                 slot = x // 100
                 pos_y = 5 - (y // 100) 
                 amount = env.state[slot] - pos_y
+                
+                player_action = NimAction(slot, amount)
 
-                action = NimAction(slot, amount)
-                print(action)
-
-                _, _, won, invalid, _ = env.step(action)
-                if invalid:
+                if not env.action_valid(player_action):
                     show_invalid_move(screen)
                     draw_game_state(screen, env.state)
                     break
+
+                print(player_action)
+                _, _, lost, _, _ = env.step(player_action)
+                print(env.state)
+                draw_game_state(screen, env.state)
+
+                if lost:
+                    show_defeat_screen(screen)
+                    running = False
+                    break
+
+                # Agent plays second
+                
+                agent_action = get_valid_action_from_agent(env, agent)
+                print(agent_action)
+                _, _, won, _, _ = env.step(agent_action)
                 print(env.state)
                 draw_game_state(screen, env.state)
 
@@ -101,17 +123,6 @@ def main():
                     show_victory_screen(screen)
                     running = False
                     break
-
-                # Agent plays second
-                action = NimAction.from_idx(agent.get_action(hash(env.state)))
-                print(action)
-                _, _, defeated, _, _ = env.step(action)
-                print(env.state)
-                draw_game_state(screen, env.state)
-
-                if defeated:
-                    show_defeat_screen(screen)
-                    running = False
 
     # Wait for user to close window
     while True:

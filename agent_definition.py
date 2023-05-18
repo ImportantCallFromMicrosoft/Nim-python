@@ -80,8 +80,8 @@ class GameEnvironment:
     REWARD_LEGAL_MOVE = 0
     PUNISHMENT_DEFEAT = -1
 
-    def step(self, action: NimAction) -> tuple[NimGameState, int, bool, dict]:
-        if (action.amount + 1) <= self.state[action.slot]:
+    def step(self, action: NimAction) -> tuple[NimGameState, int, bool, bool, dict]:
+        if self.action_valid(action):
             self.state[action.slot] = self.state[action.slot] - (action.amount + 1)
         else:
             return deepcopy(self.state), self.PUNISHMENT_ILLEGAL_MOVE, True, True, {}
@@ -97,6 +97,15 @@ class GameEnvironment:
 
     def render(self, mode="human"):
         return
+    
+    def action_valid(self, action: NimAction) -> bool:
+        return (
+            action.slot >= 0
+            and action.slot <= 4
+            and action.amount >= 0
+            and (action.amount + 1) <= self.state[action.slot]
+        )
+
 
 
 class NimAgent:

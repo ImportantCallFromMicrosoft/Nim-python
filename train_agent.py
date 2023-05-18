@@ -15,17 +15,20 @@ def print_if_verbose(msg: str):
         print(msg)
 
 
-def get_valid_state_from_opponent(
-    env: GameEnvironment, agent: NimAgent, state: NimGameState
+def get_valid_action_from_opponent(
+    env: GameEnvironment, agent: NimAgent
 ):
-    print_if_verbose(env.state)
-    truncated_other = True
-    while truncated_other:
-        action_other = NimAction.from_idx(agent.get_action(hash(state), opponent=True))
-        print_if_verbose(action_other)
-        next_state, _, terminated, truncated_other, _ = env.step(action_other)
-    return next_state, terminated
+    invalid = True
+    while invalid:
+        action = NimAction.from_idx(agent.get_action(hash(env.state), opponent=True))
+        invalid = not env.action_valid(action)
+    return action
 
+def let_opponent_move(env: GameEnvironment, agent: NimAgent) -> NimGameState:
+    action = get_valid_action_from_opponent(env, agent)
+    obs, _, done, truncated, _ = env.step(action)
+    assert not truncated
+    return obs, done
 
 # hyperparameters
 LOAD_AGENT = True
@@ -59,9 +62,8 @@ for episode in tqdm.tqdm(range(n_episodes)):
     steps = 0
     # with probability 0.5, let the opponent start
     if np.random.rand() < 0.5:
-        obs, _ = get_valid_state_from_opponent(
-            env, agent, obs
-        )
+        obs, _ = let_opponent_move(env, agent)
+        steps += 1
 
     while not done:
         # Agent takes action
@@ -74,9 +76,7 @@ for episode in tqdm.tqdm(range(n_episodes)):
 
         # let opponent take action
         if not done:
-            obs, done = get_valid_state_from_opponent(
-                env, agent, next_obs
-            )
+            obs, done = let_opponent_move(env, agent)
             steps += 1
 
     print_if_verbose(env.state)
