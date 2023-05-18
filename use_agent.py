@@ -1,4 +1,5 @@
 import pygame
+import random
 
 from agent_definition import NimAction, NimGameEnvironment, NimGameState, NimAgent
 
@@ -14,6 +15,15 @@ def get_valid_action_from_agent(env: NimGameEnvironment, agent: NimAgent):
         invalid = not env.action_valid(action)
     return action
 
+
+def show_who_starts(screen, agent_starts: bool):
+    font = pygame.font.SysFont("Arial", 50)
+    color = (150, 0, 150)
+    text =  font.render("Opponent starts!" if agent_starts else "You start!", True, color) 
+    # draw the text in the center of the screen
+    text_rect = text.get_rect(center=(WIDTH // 2, HEIGHT // 2))
+    screen.blit(text, text_rect)
+    pygame.display.flip()
 
 def draw_game_state(screen, game_state: NimGameState):
     screen.fill((0, 0, 0))
@@ -63,8 +73,6 @@ def show_invalid_move(screen):
     text_rect = text.get_rect(center=(WIDTH // 2, HEIGHT // 2))
     screen.blit(text, text_rect)
     pygame.display.flip()
-    # wait for 1 second
-    pygame.time.wait(1000)
 
 
 def main():
@@ -78,11 +86,23 @@ def main():
     clock = pygame.time.Clock()
 
     draw_game_state(screen, env.state)
-    pygame.display.flip()
+    print(env.state)
+
+    # With 50% probability, the agent plays first
+    opponent_starts = random.random() < 0.5
+    show_who_starts(screen, opponent_starts)
+    
+    if opponent_starts:
+        pygame.time.wait(1000)
+        agent_action = get_valid_action_from_agent(env, agent)
+        print(agent_action)
+        _, _, won, _, _ = env.step(agent_action)
+        print(env.state)
+        draw_game_state(screen, env.state)
 
     running = True
     while running:
-        clock.tick(60)
+        clock.tick(60) # 60 FPS
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 running = False
@@ -98,6 +118,7 @@ def main():
 
                 if not env.action_valid(player_action):
                     show_invalid_move(screen)
+                    pygame.time.wait(1500)
                     draw_game_state(screen, env.state)
                     break
 
@@ -113,6 +134,7 @@ def main():
 
                 # Agent plays second
 
+                pygame.time.wait(300)
                 agent_action = get_valid_action_from_agent(env, agent)
                 print(agent_action)
                 _, _, won, _, _ = env.step(agent_action)

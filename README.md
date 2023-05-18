@@ -41,5 +41,5 @@ To play against the trained agent run the following command:
 python -m use_agent.py
 ```
 
-This requires pygame. It is not the best and most intuitive gameplay experience so
-feel free to send a pull request for a better GUI and controls. But you should be able to get an idea of how the agent plays.
+This requires pygame. The controls are quite intuitive.
+Can you beat the agent?
