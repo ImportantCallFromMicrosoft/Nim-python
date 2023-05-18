@@ -29,8 +29,8 @@ To train the agent run the following command:
 python -m train_agent.py
 ```
 
-This creates a `agent.json` file in the root folder. This file contains the trained agents weights for the individual actions. The agent is trained for 1000000 episodes
-which should last ~5 minutes on a modern CPU. The file is quite large (~100MB) because it contains the weights for all possible states, therefore I did not include it in the repository.
+This creates a `agent.json` file in the root folder. This file contains the trained agents weights for the individual actions. The agent is trained for 100.000 episodes
+which should last less than a minuta on a modern CPU. The file is quite large (~100MB) because it contains the weights for all possible states, therefore I did not include it in the repository.
 
 
 ### Playing
