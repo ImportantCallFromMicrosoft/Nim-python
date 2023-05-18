@@ -4,7 +4,7 @@ import tqdm
 import matplotlib.pyplot as plt
 import numpy as np
 
-from agent_definition import NimAgent, GameEnvironment, NimAction, NimGameState
+from agent_definition import NimAgent, NimGameEnvironment, NimAction, NimGameState
 
 
 VERBOSE = False
@@ -16,7 +16,7 @@ def print_if_verbose(msg: str):
 
 
 def get_valid_action_from_opponent(
-    env: GameEnvironment, agent: NimAgent
+    env: NimGameEnvironment, agent: NimAgent
 ):
     invalid = True
     while invalid:
@@ -24,7 +24,7 @@ def get_valid_action_from_opponent(
         invalid = not env.action_valid(action)
     return action
 
-def let_opponent_move(env: GameEnvironment, agent: NimAgent) -> NimGameState:
+def let_opponent_move(env: NimGameEnvironment, agent: NimAgent) -> NimGameState:
     action = get_valid_action_from_opponent(env, agent)
     obs, _, done, truncated, _ = env.step(action)
     assert not truncated
@@ -48,7 +48,7 @@ agent = NimAgent(
 if LOAD_AGENT and os.path.exists("agent.json"):
     agent = NimAgent.load("agent.json")
 
-env = GameEnvironment()
+env = NimGameEnvironment()
 
 episode_lengths = []
 episode_rewards = []

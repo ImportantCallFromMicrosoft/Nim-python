@@ -1,13 +1,13 @@
 import pygame
 
-from agent_definition import NimAction, GameEnvironment, NimGameState, NimAgent
+from agent_definition import NimAction, NimGameEnvironment, NimGameState, NimAgent
 
 
 WIDTH = 500
 HEIGHT = 500
 
 def get_valid_action_from_agent(
-    env: GameEnvironment, agent: NimAgent
+    env: NimGameEnvironment, agent: NimAgent
 ):
     invalid = True
     while invalid:
@@ -69,7 +69,7 @@ def show_invalid_move(screen):
 
 def main():
     agent = NimAgent.load("agent.json")
-    env = GameEnvironment()
+    env = NimGameEnvironment()
     env.reset()
 
     pygame.init()

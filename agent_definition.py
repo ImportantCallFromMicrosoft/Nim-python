@@ -73,7 +73,7 @@ class NimAction:
         return f"Action({self.slot}, {self.amount})"
 
 
-class GameEnvironment:
+class NimGameEnvironment:
     START_STATE = NimGameState(1, 2, 3, 4, 5)
     DEFEAT_STATE = NimGameState(0, 0, 0, 0, 0)
     PUNISHMENT_ILLEGAL_MOVE = -10
