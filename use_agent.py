@@ -83,7 +83,8 @@ def main():
                 # Use plays first
                 x, y = pygame.mouse.get_pos()
                 slot = x // 100
-                amount = 4 - (y // 100)
+                pos_y = 5 - (y // 100) 
+                amount = env.state[slot] - pos_y
 
                 action = NimAction(slot, amount)
                 print(action)
