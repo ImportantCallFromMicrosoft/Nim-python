@@ -75,10 +75,10 @@ class NimAction:
 
 class GameEnvironment:
     START_STATE = NimGameState(1, 2, 3, 4, 5)
-    VICTORY_STATE = NimGameState(0, 0, 0, 0, 0)
-    PUNISHMENT_ILLEGAL_MOVE = -1
+    DEFEAT_STATE = NimGameState(0, 0, 0, 0, 0)
+    PUNISHMENT_ILLEGAL_MOVE = -10
     REWARD_LEGAL_MOVE = 0
-    REWARD_VICTORY = 1
+    PUNISHMENT_DEFEAT = -1
 
     def step(self, action: NimAction) -> tuple[NimGameState, int, bool, dict]:
         if (action.amount + 1) <= self.state[action.slot]:
@@ -86,8 +86,8 @@ class GameEnvironment:
         else:
             return deepcopy(self.state), self.PUNISHMENT_ILLEGAL_MOVE, True, True, {}
 
-        if self.state == self.VICTORY_STATE:
-            return deepcopy(self.state), self.REWARD_VICTORY, True, False, {}
+        if self.state == self.DEFEAT_STATE:
+            return deepcopy(self.state), self.PUNISHMENT_DEFEAT, True, False, {}
 
         return deepcopy(self.state), self.REWARD_LEGAL_MOVE, False, False, {}
 

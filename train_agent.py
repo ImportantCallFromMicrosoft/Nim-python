@@ -23,18 +23,14 @@ def get_valid_state_from_opponent(
     while truncated_other:
         action_other = NimAction.from_idx(agent.get_action(hash(state), opponent=True))
         print_if_verbose(action_other)
-        next_state, reward, terminated, truncated_other, _ = env.step(action_other)
-    if reward == env.REWARD_VICTORY:
-        reward = -env.REWARD_VICTORY
-    else:
-        reward = 0
-    return next_state, terminated, reward
+        next_state, _, terminated, truncated_other, _ = env.step(action_other)
+    return next_state, terminated
 
 
 # hyperparameters
 LOAD_AGENT = True
-learning_rate = 0.003
-n_episodes = 1000000
+learning_rate = 0.01
+n_episodes = 100000
 start_epsilon = 0.5
 epsilon_decay = start_epsilon / (n_episodes / 2)  # reduce the exploration over time
 final_epsilon = 0.001
@@ -63,10 +59,9 @@ for episode in tqdm.tqdm(range(n_episodes)):
     steps = 0
     # with probability 0.5, let the opponent start
     if np.random.rand() < 0.5:
-        next_obs, other_terminated, other_reward = get_valid_state_from_opponent(
+        obs, _ = get_valid_state_from_opponent(
             env, agent, obs
         )
-        obs = next_obs
 
     while not done:
         # Agent takes action
@@ -79,12 +74,10 @@ for episode in tqdm.tqdm(range(n_episodes)):
 
         # let opponent take action
         if not done:
-            next_next_obs, done, other_reward = get_valid_state_from_opponent(
+            obs, done = get_valid_state_from_opponent(
                 env, agent, next_obs
             )
-            reward += other_reward
             steps += 1
-            obs = next_next_obs
 
     print_if_verbose(env.state)
     print_if_verbose("Episode finished")
@@ -130,7 +123,7 @@ axs[2].plot(range(len(training_truncated_ratio)), training_truncated_ratio)
 axs[3].set_title("Ratio of won episodes to total episodes")
 training_win_ratio = (
     np.convolve(
-        np.array([r > 0 for r in episode_rewards]),
+        np.array([r == 0 for r in episode_rewards]),
         np.ones(rolling_length),
         mode="valid",
     )
